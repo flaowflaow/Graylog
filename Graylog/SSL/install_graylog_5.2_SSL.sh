@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script d'installation d'un serveur de gestion de logs Graylog.
-# Services : Graylog, ElasticSearch, MongoDB
+# Services : Graylog, OpenSearch, MongoDB
 
 # Installation des prérequis
 sudo apt update && apt upgrade -y
