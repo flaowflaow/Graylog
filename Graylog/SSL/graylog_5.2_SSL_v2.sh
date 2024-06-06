@@ -1,5 +1,6 @@
 #!/bin/bash
 # Script d'installation d'un serveur de gestion de logs Graylog.
+# Tested on Ubuntu Server 22.04.4 LTS & Ubuntu Server 24.04 LTS
 # Services : Graylog, OpenSearch, MongoDB
 # Création d'un certificat SSL autosigné
 
