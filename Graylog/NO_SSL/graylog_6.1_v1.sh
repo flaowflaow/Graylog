@@ -6,25 +6,75 @@
 
 
 # Configuration réseau de la VM
-# Afficher les interfaces réseau disponibles
+# Fonction principale
+function config_network() {
+    # Afficher les interfaces réseau disponibles
+    echo "Interfaces réseau disponibles :"
+    interfaces=$(ip link show | awk -F: '$0 !~ "lo|vir|wl|^[^0-9]"{print $2;getline}')
 
-echo "Interfaces réseau disponibles :"
+    # Affichage des interfaces disponibles dans un format lisible
+    echo "$interfaces"
 
-ip link show | awk -F: '$0 !~ "lo|vir|wl|^[^0-9]"{print $2;getline}'
+    # Demander à l'utilisateur de sélectionner l'interface réseau
+    read -p "Entrez l'interface réseau à configurer (par exemple: eth0, ens33): " selected_interface
 
-read -p "Entrez l'interface reseau a configurer: " selected_interface
+    ##### DEMANDE DES VARIABLES PERSONNALISÉES #####
+    echo "Veuillez fournir les informations suivantes :"
+    read -p "Adresse IP: " ip_address
+    read -p "Masque de sous réseau (e.g., 24 pour /24): " subnet_mask
+    read -p "Passerelle par défaut: " gateway
+    read -p "Serveur DNS primaire: " dns_primary
+    read -p "Serveur DNS secondaire (en option): " dns_secondary
+    read -p "Votre domaine (ex: yourdomain.local): " domain
+    read -p "Région : " state
+    read -p "Ville : " city
+    read -p "Lieu : " location
 
-##### DEMANDE DES VARIABLES PERSONNALISÉES #####
-echo "Veuillez fournir les informations suivantes :"
-read -p "Adresse IP: " ip_address
-read -p "Masque de sous reseau (e.g., 24 for /24): " subnet_mask
-read -p "Passerelle par defaut: " gateway
-read -p "Serveur DNS primaire: " dns_primary
-read -p "Serveur DNS secondaire (en option): " dns_secondary
-read -p "Votre domaine (ex: yourdomain.local): "  domain
-read -p "Région : " state
-read -p "Ville : " city
-read -p "Lieu : " location
+    # Afficher un résumé des informations saisies
+    echo "Voici les informations que vous avez fournies :"
+    echo "---------------------------------------------------"
+    echo "Interfaces réseau disponibles :"
+    echo "$interfaces"
+    echo "---------------------------------------------------"
+    echo "Interface réseau sélectionnée : $selected_interface"
+    echo "Adresse IP : $ip_address"
+    echo "Masque de sous réseau : $subnet_mask"
+    echo "Passerelle par défaut : $gateway"
+    echo "Serveur DNS primaire : $dns_primary"
+    echo "Serveur DNS secondaire : $dns_secondary"
+    echo "Votre domaine : $domain"
+    echo "Région : $state"
+    echo "Ville : $city"
+    echo "Lieu : $location"
+    echo "---------------------------------------------------"
+
+    # Demander une confirmation
+    read -p "Voulez-vous continuer avec ces informations ? (oui/non): " confirmation
+
+    # Si l'utilisateur confirme, continuer, sinon recommencer
+    if [[ "$confirmation" == "oui" || "$confirmation" == "o" ]]; then
+        echo "Vous avez confirmé les informations. Le script va continuer."
+        # Ajouter ici les actions à réaliser après confirmation
+        # Par exemple, configurer l'interface réseau et appliquer les paramètres
+
+        # Exemple d'ajout des configurations (à ajuster en fonction de votre besoin)
+        echo "Configuration de l'interface réseau $selected_interface..."
+        sudo ip addr add $ip_address/$subnet_mask dev $selected_interface
+        sudo ip route add default via $gateway
+        echo "DNS primaires : $dns_primary" | sudo tee /etc/resolv.conf
+        echo "DNS secondaires : $dns_secondary" | sudo tee -a /etc/resolv.conf
+        echo "Configuration terminée."
+
+    else
+        echo "Les informations ont été rejetées. Veuillez recommencer."
+        # Recommencer le script
+        config_network
+    fi
+}
+
+# Démarrer le script
+config_network
+
 
 # Créer le fichier de configuration Netplan en fournissant les détails
 
